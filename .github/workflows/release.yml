@@ -1,4 +1,4 @@
-name: Build & Release LocalTLS (macOS & Windows — Standard & Tunnel Editions)
+name: Build & Release Ophiuchi-rs (macOS & Windows — Standard & Tunnel Editions)
 
 on:
   push:
@@ -76,14 +76,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v__VERSION__
-          releaseName: "LocalTLS v__VERSION__"
+          releaseName: "Ophiuchi-rs v__VERSION__"
           releaseBody: |
-            ## LocalTLS v__VERSION__
+            ## Ophiuchi-rs v__VERSION__
 
             Cross-platform localhost SSL reverse proxy manager for **macOS** and **Windows** — available in two editions:
 
-            - **Standard Edition (`LocalTLS`)**: Lightweight local-only HTTPS/WebSocket reverse proxy with Local Root CA and managed hosts sync (zero external tunnel dependencies).
-            - **Tunnel Edition (`LocalTLS Tunnel`)**: Includes everything in Standard Edition **plus** built-in blind-TLS public tunnels powered by [`opentunnel`](https://github.com/anomalyco/opentunnel) (`https://<route>.<id>.opentunnel.xyz`).
+            - **Standard Edition (`Ophiuchi-rs`)**: Lightweight local-only HTTPS/WebSocket reverse proxy with Local Root CA and managed hosts sync (zero external tunnel dependencies).
+            - **Tunnel Edition (`Ophiuchi-rs Tunnel`)**: Includes everything in Standard Edition **plus** built-in blind-TLS public tunnels powered by [`opentunnel`](https://github.com/anomalyco/opentunnel) (`https://<route>.<id>.opentunnel.xyz`).
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

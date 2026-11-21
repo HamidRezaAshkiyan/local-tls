@@ -98,7 +98,7 @@ mod imp {
     use parking_lot::RwLock;
     use tokio::sync::Mutex as AsyncMutex;
 
-    const PROFILE_NAME: &str = "localtls";
+    const PROFILE_NAME: &str = "ophiuchi-rs";
 
     struct ActiveTunnel {
         tunnel: Tunnel,
@@ -356,7 +356,7 @@ mod imp {
             _on_status: TunnelStatusCallback,
         ) -> Result<TunnelStatusDto, String> {
             Err(
-                "Public tunnels are only available in LocalTLS Tunnel Edition. Download LocalTLS Tunnel to use OpenTunnel."
+                "Public tunnels are only available in Ophiuchi-rs Tunnel Edition. Download Ophiuchi-rs Tunnel to use OpenTunnel."
                     .to_string(),
             )
         }

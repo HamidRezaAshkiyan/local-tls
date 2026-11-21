@@ -352,7 +352,7 @@ fn html_error_response(status: StatusCode, title: &str, detail: &str) -> Respons
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>{code} {title} — LocalTLS</title>
+  <title>{code} {title} — Ophiuchi-rs</title>
   <style>
     body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #09090b; color: #f4f4f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }}
     .card {{ max-width: 520px; background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }}
@@ -364,7 +364,7 @@ fn html_error_response(status: StatusCode, title: &str, detail: &str) -> Respons
 </head>
 <body>
   <div class="card">
-    <div class="badge">LocalTLS • HTTP {code}</div>
+    <div class="badge">Ophiuchi-rs • HTTP {code}</div>
     <h1>{title}</h1>
     <p>{detail}</p>
   </div>

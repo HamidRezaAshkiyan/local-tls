@@ -1,10 +1,10 @@
 {
-  "productName": "LocalTLS Tunnel",
-  "identifier": "com.localtls.tunnel",
+  "productName": "Ophiuchi-rs Tunnel",
+  "identifier": "com.ophiuchirs.tunnel",
   "app": {
     "windows": [
       {
-        "title": "LocalTLS Tunnel — Localhost SSL Proxy & Public Tunnels",
+        "title": "Ophiuchi-rs Tunnel — Localhost SSL Proxy & Public Tunnels",
         "width": 1160,
         "height": 760,
         "minWidth": 900,

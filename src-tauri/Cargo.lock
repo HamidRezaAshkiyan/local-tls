@@ -2402,39 +2402,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47d9d19d1d6efa0109d2f65ff4c85cddd50bd572e5a00127ab10987290bcefae"
 
 [[package]]
-name = "local-tls"
-version = "0.1.0"
-dependencies = [
- "bytes",
- "chrono",
- "futures-util",
- "http-body-util",
- "hyper",
- "hyper-util",
- "opentunnel",
- "parking_lot",
- "rcgen 0.13.2",
- "rustls",
- "rustls-pemfile",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-opener",
- "tempfile",
- "thiserror 2.0.21",
- "time",
- "tokio",
- "tokio-rustls",
- "tokio-tungstenite 0.26.2",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "x509-parser 0.16.0",
-]
-
-[[package]]
 name = "lock_api"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2942,6 +2909,39 @@ dependencies = [
  "toml 1.2.1+spec-1.1.0",
  "tracing",
  "webpki-root-certs",
+]
+
+[[package]]
+name = "ophiuchi-rs"
+version = "0.2.0"
+dependencies = [
+ "bytes",
+ "chrono",
+ "futures-util",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "opentunnel",
+ "parking_lot",
+ "rcgen 0.13.2",
+ "rustls",
+ "rustls-pemfile",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-opener",
+ "tempfile",
+ "thiserror 2.0.21",
+ "time",
+ "tokio",
+ "tokio-rustls",
+ "tokio-tungstenite 0.26.2",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+ "x509-parser 0.16.0",
 ]
 
 [[package]]

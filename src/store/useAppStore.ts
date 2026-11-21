@@ -314,7 +314,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ busyAction: "ca" });
     try {
       await api.trustRootCa();
-      get().addToast("success", "LocalTLS Root CA is now trusted by your OS");
+      get().addToast("success", "Ophiuchi-rs Root CA is now trusted by your OS");
       await get().refreshDiagnostics();
     } catch (err) {
       get().addToast("error", formatError(err));
@@ -327,7 +327,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ busyAction: "ca" });
     try {
       await api.untrustRootCa();
-      get().addToast("info", "LocalTLS Root CA removed from OS trust store");
+      get().addToast("info", "Ophiuchi-rs Root CA removed from OS trust store");
       await get().refreshDiagnostics();
     } catch (err) {
       get().addToast("error", formatError(err));

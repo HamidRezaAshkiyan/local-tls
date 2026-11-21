@@ -39,7 +39,7 @@ export function LogsView() {
             Live Request Logs
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Real-time HTTPS and WebSocket traffic routed through LocalTLS.
+            Real-time HTTPS and WebSocket traffic routed through Ophiuchi-rs.
           </p>
         </div>
 

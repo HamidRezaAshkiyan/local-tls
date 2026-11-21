@@ -61,7 +61,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center bg-zinc-950 text-sm text-zinc-400">
-        Loading LocalTLS...
+        Loading Ophiuchi-rs...
       </div>
     );
   }

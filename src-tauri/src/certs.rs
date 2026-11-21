@@ -14,8 +14,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use time::{Duration, OffsetDateTime};
 
-pub const CA_COMMON_NAME: &str = "LocalTLS Local Root CA";
-pub const CA_ORGANIZATION: &str = "LocalTLS";
+pub const CA_COMMON_NAME: &str = "Ophiuchi-rs Local Root CA";
+pub const CA_ORGANIZATION: &str = "Ophiuchi-rs";
 
 struct RootCa {
     cert: Certificate,

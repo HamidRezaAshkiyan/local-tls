@@ -4,8 +4,8 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub const BLOCK_START: &str = "# >>> LocalTLS Managed Hosts >>>";
-pub const BLOCK_END: &str = "# <<< LocalTLS Managed Hosts <<<";
+pub const BLOCK_START: &str = "# >>> Ophiuchi-rs Managed Hosts >>>";
+pub const BLOCK_END: &str = "# <<< Ophiuchi-rs Managed Hosts <<<";
 
 /// Reads the current OS hosts file content.
 pub fn read_hosts_file() -> Result<String, String> {
@@ -175,7 +175,7 @@ mod tests {
         let original = "127.0.0.1 localhost\r\n# Windows hosts\r\n";
         let rendered = render_hosts_with_managed_block(original, &["app.local.test".into()]);
         assert!(rendered.contains("\r\n"));
-        assert!(rendered.contains("# >>> LocalTLS Managed Hosts >>>\r\n127.0.0.1 app.local.test\r\n"));
+        assert!(rendered.contains("# >>> Ophiuchi-rs Managed Hosts >>>\r\n127.0.0.1 app.local.test\r\n"));
     }
 
     #[test]

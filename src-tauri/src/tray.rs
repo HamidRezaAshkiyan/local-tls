@@ -5,13 +5,13 @@ use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Manager};
 
-pub const TRAY_ID: &str = "localtls-tray";
+pub const TRAY_ID: &str = "ophiuchirs-tray";
 const MENU_SHOW: &str = "show";
 const MENU_TOGGLE_PROXY: &str = "toggle_proxy";
 const MENU_QUIT: &str = "quit";
 
 pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
-    let show_item = MenuItem::with_id(app, MENU_SHOW, "Open LocalTLS", true, None::<&str>)?;
+    let show_item = MenuItem::with_id(app, MENU_SHOW, "Open Ophiuchi-rs", true, None::<&str>)?;
     let toggle_item = MenuItem::with_id(
         app,
         MENU_TOGGLE_PROXY,
@@ -20,13 +20,13 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         None::<&str>,
     )?;
     let separator = PredefinedMenuItem::separator(app)?;
-    let quit_item = MenuItem::with_id(app, MENU_QUIT, "Quit LocalTLS", true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app, MENU_QUIT, "Quit Ophiuchi-rs", true, None::<&str>)?;
 
     let menu = Menu::with_items(app, &[&show_item, &toggle_item, &separator, &quit_item])?;
 
     let mut builder = TrayIconBuilder::with_id(TRAY_ID)
         .menu(&menu)
-        .tooltip("LocalTLS — Localhost SSL Proxy")
+        .tooltip("Ophiuchi-rs — Localhost SSL Proxy")
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id().as_ref() {
             MENU_SHOW => {

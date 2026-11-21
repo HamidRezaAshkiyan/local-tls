@@ -60,10 +60,10 @@ export function SettingsView() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "localtls-config.json";
+      a.download = "ophiuchi-rs-config.json";
       a.click();
       URL.revokeObjectURL(url);
-      addToast("success", "Exported localtls-config.json");
+      addToast("success", "Exported ophiuchi-rs-config.json");
     } catch (err) {
       addToast("error", typeof err === "string" ? err : "Export failed");
     }

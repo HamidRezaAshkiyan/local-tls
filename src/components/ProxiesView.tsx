@@ -136,7 +136,7 @@ export function ProxiesView() {
             <div className="flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-300">
               <ShieldAlert className="h-4 w-4 shrink-0" />
               <span>
-                <strong>LocalTLS Root CA is not trusted yet.</strong> Trust it
+                <strong>Ophiuchi-rs Root CA is not trusted yet.</strong> Trust it
                 once so every local domain gets a green padlock automatically.
               </span>
             </div>

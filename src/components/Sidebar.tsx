@@ -59,7 +59,7 @@ export function Sidebar() {
         <div>
           <div className="flex items-center gap-1.5">
             <h1 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-              LocalTLS
+              Ophiuchi-rs
             </h1>
             <span
               className={`rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wide uppercase ${

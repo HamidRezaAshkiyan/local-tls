@@ -16,7 +16,7 @@ use tauri::{Manager, WindowEvent};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let _ = tracing_subscriber::fmt()
-        .with_env_filter("local_tls_lib=info")
+        .with_env_filter("ophiuchi_rs_lib=info")
         .try_init();
 
     tauri::Builder::default()

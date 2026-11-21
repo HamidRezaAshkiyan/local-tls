@@ -1,12 +1,12 @@
 [package]
-name = "local-tls"
-version = "0.1.0"
+name = "ophiuchi-rs"
+version = "0.2.0"
 description = "Cross-platform localhost SSL reverse proxy manager for macOS and Windows"
-authors = ["LocalTLS Contributors"]
+authors = ["Ophiuchi-rs Contributors"]
 edition = "2021"
 
 [lib]
-name = "local_tls_lib"
+name = "ophiuchi_rs_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]
