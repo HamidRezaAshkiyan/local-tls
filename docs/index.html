@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ophiuchi-rs — Localhost SSL Proxy for macOS &amp; Windows</title>
+    <meta
+      name="description"
+      content="Fast, zero-dependency Rust desktop app for trusted local HTTPS domains on macOS &amp; Windows — no Docker required. Available in Standard and OpenTunnel editions."
+    />
+    <link rel="icon" type="image/png" href="./icon.png" />
+    <style>
+      :root {
+        --bg: #09090b;
+        --bg-elev: #111114;
+        --bg-card: rgba(24, 24, 27, 0.72);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --text: #fafafa;
+        --text-muted: #a1a1aa;
+        --text-dim: #71717a;
+        --emerald: #10b981;
+        --emerald-soft: rgba(16, 185, 129, 0.14);
+        --violet: #8b5cf6;
+        --violet-soft: rgba(139, 92, 246, 0.14);
+        --radius: 14px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      .glow {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
+        background:
+          radial-gradient(600px 420px at 18% 8%, rgba(16, 185, 129, 0.13), transparent 70%),
+          radial-gradient(560px 420px at 82% 14%, rgba(139, 92, 246, 0.11), transparent 70%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      code,
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .container {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* Nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        backdrop-filter: blur(14px);
+        background: rgba(9, 9, 11, 0.78);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        font-size: 16px;
+      }
+
+      .brand img {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .nav-links a:hover {
+        color: var(--text);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.16s ease;
+      }
+
+      .btn-primary {
+        background: var(--emerald);
+        color: #032117;
+        box-shadow: 0 8px 28px rgba(16, 185, 129, 0.25);
+      }
+
+      .btn-primary:hover {
+        background: #34d399;
+        transform: translateY(-1px);
+      }
+
+      .btn-violet {
+        background: var(--violet);
+        color: #fff;
+        box-shadow: 0 8px 28px rgba(139, 92, 246, 0.25);
+      }
+
+      .btn-violet:hover {
+        background: #a78bfa;
+        transform: translateY(-1px);
+      }
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--border-strong);
+        color: var(--text);
+      }
+
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* Hero */
+      .hero {
+        padding: 84px 0 56px;
+        text-align: center;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6ee7b7;
+        background: var(--emerald-soft);
+        border: 1px solid rgba(16, 185, 129, 0.28);
+        margin-bottom: 22px;
+      }
+
+      .pill-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--emerald);
+        box-shadow: 0 0 10px var(--emerald);
+      }
+
+      h1 {
+        margin: 0 auto 18px;
+        max-width: 780px;
+        font-size: clamp(36px, 6vw, 60px);
+        line-height: 1.06;
+        letter-spacing: -0.035em;
+        font-weight: 750;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #34d399 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .subtitle {
+        margin: 0 auto 32px;
+        max-width: 620px;
+        font-size: 17px;
+        color: var(--text-muted);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 48px;
+      }
+
+      /* App Mockup */
+      .mockup {
+        max-width: 920px;
+        margin: 0 auto;
+        border-radius: 16px;
+        border: 1px solid var(--border-strong);
+        background: #0c0c0f;
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65);
+        overflow: hidden;
+        text-align: left;
+      }
+
+      .mockup-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #141418;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .dots {
+        display: flex;
+        gap: 7px;
+      }
+
+      .dots span {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+
+      .mockup-body {
+        display: grid;
+        grid-template-columns: 210px 1fr;
+        min-height: 310px;
+      }
+
+      .mockup-side {
+        border-right: 1px solid var(--border);
+        padding: 16px;
+        background: #0a0a0d;
+      }
+
+      .status-box {
+        border: 1px solid var(--border);
+        background: #141418;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        font-size: 12px;
+      }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .badge-green {
+        background: var(--emerald-soft);
+        color: #34d399;
+      }
+
+      .badge-violet {
+        background: var(--violet-soft);
+        color: #c4b5fd;
+      }
+
+      .mockup-main {
+        padding: 18px 20px;
+      }
+
+      .route-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .route-table th {
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-dim);
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .route-table td {
+        padding: 11px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .domain {
+        color: #34d399;
+        font-weight: 500;
+      }
+
+      /* Sections */
+      section {
+        padding: 72px 0;
+      }
+
+      .section-head {
+        text-align: center;
+        margin-bottom: 44px;
+      }
+
+      .section-head h2 {
+        margin: 0 0 10px;
+        font-size: clamp(26px, 4vw, 36px);
+        letter-spacing: -0.025em;
+      }
+
+      .section-head p {
+        margin: 0 auto;
+        max-width: 580px;
+        color: var(--text-muted);
+        font-size: 15px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        font-weight: 650;
+      }
+
+      .card p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .edition-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .edition-card.tunnel {
+        border-color: rgba(139, 92, 246, 0.38);
+        background: linear-gradient(
+          180deg,
+          rgba(139, 92, 246, 0.08) 0%,
+          rgba(24, 24, 27, 0.78) 100%
+        );
+      }
+
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 0;
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .checklist li::before {
+        content: "✓";
+        color: var(--emerald);
+        font-weight: 700;
+        margin-right: 10px;
+      }
+
+      .edition-card.tunnel .checklist li::before {
+        color: #a78bfa;
+      }
+
+      .dl-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .dl-group .btn {
+        flex: 1;
+        min-width: 155px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+
+      .step-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        background: var(--emerald-soft);
+        color: #34d399;
+        margin-bottom: 12px;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 36px 0;
+        font-size: 13px;
+        color: var(--text-dim);
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      @media (max-width: 820px) {
+        .grid-3,
+        .grid-2,
+        .steps,
+        .mockup-body {
+          grid-template-columns: 1fr;
+        }
+        .mockup-side {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow"></div>
+
+    <nav>
+      <div class="container nav-inner">
+        <a class="brand" href="#">
+          <img src="./icon.png" alt="Ophiuchi-rs icon" />
+          <span>Ophiuchi-rs</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#editions">Editions &amp; Downloads</a>
+          <a href="#how-it-works">How It Works</a>
+          <a
+            href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs"
+            target="_blank"
+            rel="noopener"
+            >GitHub</a
+          >
+        </div>
+        <a class="btn btn-primary" href="#editions">Download</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="pill">
+            <span class="pill-dot"></span>
+            <span id="version-badge">macOS &amp; Windows • Built in Rust &amp; Tauri v2</span>
+          </div>
+          <h1>
+            Trusted <span class="gradient-text">HTTPS on Localhost</span> in 5
+            Seconds — No Docker Needed.
+          </h1>
+          <p class="subtitle">
+            Ophiuchi-rs is a native, cross-platform localhost SSL reverse proxy
+            for macOS and Windows. Trust one Local Root CA, map any custom
+            domain to any local port, and optionally share it publicly with
+            blind-TLS OpenTunnel.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#editions">Download for macOS &amp; Windows</a>
+            <a
+              class="btn btn-ghost"
+              href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs"
+              target="_blank"
+              rel="noopener"
+              >View Source on GitHub</a
+            >
+          </div>
+
+          <div class="mockup" aria-label="Ophiuchi-rs interface preview">
+            <div class="mockup-bar">
+              <div class="dots">
+                <span style="background: #ef4444"></span>
+                <span style="background: #f59e0b"></span>
+                <span style="background: #10b981"></span>
+              </div>
+              <span class="mono" style="font-size: 12px; color: var(--text-dim)"
+                >Ophiuchi-rs — Localhost SSL Proxy</span
+              >
+              <span class="badge badge-green">● Running :443</span>
+            </div>
+            <div class="mockup-body">
+              <div class="mockup-side">
+                <div class="status-box">
+                  <div class="status-row">
+                    <span>Proxy Server</span>
+                    <span class="mono" style="color: #34d399">:443</span>
+                  </div>
+                  <div style="margin-top: 6px; font-size: 11px; color: var(--text-dim)">
+                    3 active routes • HTTP/2 + WS
+                  </div>
+                </div>
+                <div class="status-box" style="border-color: rgba(139, 92, 246, 0.3)">
+                  <div class="status-row">
+                    <span>OpenTunnel</span>
+                    <span class="badge badge-violet">connected</span>
+                  </div>
+                  <div
+                    class="mono"
+                    style="margin-top: 6px; font-size: 10px; color: var(--text-dim)"
+                  >
+                    *.7f2a9c.opentunnel.xyz
+                  </div>
+                </div>
+              </div>
+              <div class="mockup-main">
+                <table class="route-table">
+                  <thead>
+                    <tr>
+                      <th>HTTPS Domain</th>
+                      <th>Upstream</th>
+                      <th>Hosts</th>
+                      <th>Public Tunnel</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="mono domain">https://app.myapp.test</td>
+                      <td class="mono" style="color: var(--text-muted)">127.0.0.1:5173</td>
+                      <td><span class="badge badge-green">Synced</span></td>
+                      <td><span class="badge badge-violet">Shared</span></td>
+                    </tr>
+                    <tr>
+                      <td class="mono domain">https://api.myapp.test</td>
+                      <td class="mono" style="color: var(--text-muted)">127.0.0.1:8080</td>
+                      <td><span class="badge badge-green">Synced</span></td>
+                      <td><span class="badge badge-violet">Shared</span></td>
+                    </tr>
+                    <tr>
+                      <td class="mono domain">https://studio.local.test</td>
+                      <td class="mono" style="color: var(--text-muted)">127.0.0.1:3000</td>
+                      <td><span class="badge badge-green">Synced</span></td>
+                      <td style="font-size: 12px; color: var(--text-dim)">Off</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <div class="container">
+          <div class="section-head">
+            <h2>Everything you need for local HTTPS</h2>
+            <p>
+              Inspired by Ophiuchi, re-architected in pure Rust so it runs
+              natively on macOS and Windows with tiny memory usage and zero
+              Docker overhead.
+            </p>
+          </div>
+          <div class="grid-3">
+            <div class="card">
+              <h3>Native Rust HTTPS Proxy</h3>
+              <p>
+                Built on <code>tokio</code>, <code>hyper</code>, and
+                <code>tokio-rustls</code>. Full SNI, HTTP/1.1, HTTP/2,
+                WebSocket/HMR tunneling, live route hot-reload, and HTTP → HTTPS
+                redirection.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Trust-Once Local Root CA</h3>
+              <p>
+                Generates an ECDSA P-256 Local Root CA trusted once in macOS
+                System Keychain or Windows User Root Store. Every new domain is
+                auto-signed and trusted immediately.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Safe Managed Hosts Sync</h3>
+              <p>
+                Updates <code>/etc/hosts</code> or Windows
+                <code>drivers\etc\hosts</code> inside dedicated markers with
+                automatic timestamped backups and native admin/UAC prompts.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Optional Blind-TLS Tunnels</h3>
+              <p>
+                Tunnel Edition embeds <code>opentunnel</code> to expose any
+                local proxy at a public HTTPS URL while terminating TLS locally
+                on your machine.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Live Request Logs</h3>
+              <p>
+                Inspect real-time HTTPS and WebSocket traffic with status codes,
+                upstream targets, latency in ms, instant search, and pause/clear
+                controls.
+              </p>
+            </div>
+            <div class="card">
+              <h3>System Tray &amp; Diagnostics</h3>
+              <p>
+                Keep the proxy running quietly in the macOS menubar or Windows
+                tray, and check CA trust, hosts sync, and port 443/80 health at
+                a glance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="editions">
+        <div class="container">
+          <div class="section-head">
+            <h2>Two Editions. Pick Your Footprint.</h2>
+            <p>
+              Both editions share the exact same Rust HTTPS core and install
+              side-by-side cleanly on macOS and Windows.
+            </p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card edition-card">
+              <div>
+                <span class="badge badge-green">Standard Edition</span>
+                <h3 style="margin-top: 12px; font-size: 22px">Ophiuchi-rs</h3>
+                <p>
+                  Lightweight, 100% local-only SSL reverse proxy with zero
+                  external network or tunnel dependencies compiled in.
+                </p>
+                <ul class="checklist">
+                  <li>Native Rust HTTPS, HTTP/2 &amp; WebSocket reverse proxy</li>
+                  <li>Trust-once Local Root CA (macOS Keychain &amp; Windows Cert Store)</li>
+                  <li>Managed hosts file sync with automatic backups</li>
+                  <li>Proxy groups, live request logs, diagnostics &amp; system tray</li>
+                </ul>
+              </div>
+              <div class="dl-group">
+                <a
+                  id="dl-std-mac"
+                  class="btn btn-primary"
+                  href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs/releases/latest"
+                  >macOS (.dmg)</a
+                >
+                <a
+                  id="dl-std-win"
+                  class="btn btn-ghost"
+                  href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs/releases/latest"
+                  >Windows (.exe)</a
+                >
+              </div>
+            </div>
+
+            <div class="card edition-card tunnel">
+              <div>
+                <span class="badge badge-violet">Tunnel Edition</span>
+                <h3 style="margin-top: 12px; font-size: 22px">Ophiuchi-rs Tunnel</h3>
+                <p>
+                  Everything in Standard Edition plus built-in blind-TLS public
+                  tunnels powered by <code>anomalyco/opentunnel</code>.
+                </p>
+                <ul class="checklist">
+                  <li>Everything included in Ophiuchi-rs Standard Edition</li>
+                  <li>One-click public HTTPS URLs per proxy (webhooks &amp; mobile testing)</li>
+                  <li>End-to-end TLS terminated locally on your machine</li>
+                  <li>Optional self-hosted OpenTunnel server URL in Settings</li>
+                </ul>
+              </div>
+              <div class="dl-group">
+                <a
+                  id="dl-tun-mac"
+                  class="btn btn-violet"
+                  href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs/releases/latest"
+                  >macOS Tunnel (.dmg)</a
+                >
+                <a
+                  id="dl-tun-win"
+                  class="btn btn-ghost"
+                  href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs/releases/latest"
+                  >Windows Tunnel (.exe)</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works">
+        <div class="container">
+          <div class="section-head">
+            <h2>Up and running in 3 steps</h2>
+          </div>
+          <div class="steps">
+            <div class="card">
+              <div class="step-num">1</div>
+              <h3>Trust Local Root CA</h3>
+              <p>
+                Click <strong>Trust Root CA</strong> once. macOS or Windows
+                registers Ophiuchi-rs's local CA so browsers show a green
+                padlock automatically.
+              </p>
+            </div>
+            <div class="card">
+              <div class="step-num">2</div>
+              <h3>Add a Domain &amp; Sync Hosts</h3>
+              <p>
+                Map <code>api.myapp.test</code> to <code>127.0.0.1:3000</code>
+                and click <strong>Sync Hosts</strong>. Your existing hosts
+                entries are backed up and preserved.
+              </p>
+            </div>
+            <div class="card">
+              <div class="step-num">3</div>
+              <h3>Start Proxy (or Share Publicly)</h3>
+              <p>
+                Start the built-in Rust proxy on port 443 — or toggle
+                <strong>Public Tunnel</strong> in Tunnel Edition to share over
+                a real public HTTPS URL.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <div>Ophiuchi-rs — Open-source localhost SSL proxy for macOS &amp; Windows.</div>
+        <div style="display: flex; gap: 18px">
+          <a
+            href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs"
+            target="_blank"
+            rel="noopener"
+            >GitHub</a
+          >
+          <a
+            href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs/releases"
+            target="_blank"
+            rel="noopener"
+            >Releases</a
+          >
+          <a
+            href="https://github.com/HamidRezaAshkiyan/ophiuchi-rs/issues"
+            target="_blank"
+            rel="noopener"
+            >Issues</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (async () => {
+        try {
+          const res = await fetch(
+            "https://api.github.com/repos/HamidRezaAshkiyan/ophiuchi-rs/releases/latest",
+          );
+          if (!res.ok) return;
+          const rel = await res.json();
+          if (rel.tag_name) {
+            const badge = document.getElementById("version-badge");
+            if (badge) {
+              badge.textContent = `${rel.tag_name} • macOS & Windows • Rust + Tauri v2`;
+            }
+          }
+          const assets = Array.isArray(rel.assets) ? rel.assets : [];
+          const findAsset = (isTunnel, ext) =>
+            assets.find((a) => {
+              const name = (a.name || "").toLowerCase();
+              const hasTunnel = name.includes("tunnel");
+              return hasTunnel === isTunnel && name.endsWith(ext);
+            });
+
+          const stdMac = findAsset(false, ".dmg");
+          const stdWin = findAsset(false, ".exe") || findAsset(false, ".msi");
+          const tunMac = findAsset(true, ".dmg");
+          const tunWin = findAsset(true, ".exe") || findAsset(true, ".msi");
+
+          if (stdMac) document.getElementById("dl-std-mac").href = stdMac.browser_download_url;
+          if (stdWin) document.getElementById("dl-std-win").href = stdWin.browser_download_url;
+          if (tunMac) document.getElementById("dl-tun-mac").href = tunMac.browser_download_url;
+          if (tunWin) document.getElementById("dl-tun-win").href = tunWin.browser_download_url;
+        } catch {
+          // Fallback links already point to /releases/latest
+        }
+      })();
+    </script>
+  </body>
+</html>

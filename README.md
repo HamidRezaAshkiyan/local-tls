@@ -1,5 +1,7 @@
 # Ophiuchi-rs — Cross-Platform Localhost SSL Proxy Manager
 
+🌐 **Website & Downloads**: https://hamidrezaashkiyan.github.io/ophiuchi-rs/
+
 A fast, zero-dependency Rust + Tauri v2 desktop application for **macOS** and **Windows** that gives your local dev servers trusted `https://` custom domains in seconds — inspired by [`ophiuchi-desktop`](https://github.com/cheeselemon/ophiuchi-desktop), without requiring Docker or Nginx.
 
 ## Two Editions
