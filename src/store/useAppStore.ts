@@ -6,8 +6,10 @@ import type {
   AppConfig,
   AppSettings,
   DiagnosticsReport,
+  EditionInfo,
   ProxyLogEntry,
   ProxyServerStatus,
+  TunnelStatus,
   UpdateProxyInput,
 } from "../types";
 
@@ -18,13 +20,15 @@ export interface ToastMessage {
 }
 
 interface AppStore {
+  edition: EditionInfo;
   config: AppConfig | null;
   status: ProxyServerStatus | null;
+  tunnelStatus: TunnelStatus | null;
   diagnostics: DiagnosticsReport | null;
   logs: ProxyLogEntry[];
   logsPaused: boolean;
   activeTab: ActiveTab;
-  selectedGroupId: string; // "all" or group id
+  selectedGroupId: string;
   loading: boolean;
   busyAction: string | null;
   toasts: ToastMessage[];
@@ -34,6 +38,7 @@ interface AppStore {
   setLogsPaused: (paused: boolean) => void;
   pushLog: (entry: ProxyLogEntry) => void;
   setStatus: (status: ProxyServerStatus) => void;
+  setTunnelStatus: (status: TunnelStatus) => void;
   addToast: (kind: ToastMessage["kind"], text: string) => void;
   dismissToast: (id: string) => void;
 
@@ -44,6 +49,14 @@ interface AppStore {
   updateProxy: (input: UpdateProxyInput) => Promise<void>;
   deleteProxy: (id: string) => Promise<void>;
   toggleProxy: (id: string, enabled: boolean) => Promise<void>;
+  setProxyTunnel: (
+    id: string,
+    tunnelEnabled: boolean,
+    tunnelRouteName?: string | null,
+  ) => Promise<void>;
+
+  startTunnel: () => Promise<void>;
+  stopTunnel: () => Promise<void>;
 
   addGroup: (name: string, color: string) => Promise<void>;
   updateGroup: (id: string, name: string, color: string) => Promise<void>;
@@ -69,8 +82,10 @@ function formatError(err: unknown): string {
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
+  edition: { edition: "standard", tunnelSupported: false },
   config: null,
   status: null,
+  tunnelStatus: null,
   diagnostics: null,
   logs: [],
   logsPaused: false,
@@ -94,6 +109,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   setStatus: (status) => set({ status }),
+  setTunnelStatus: (tunnelStatus) => set({ tunnelStatus }),
 
   addToast: (kind, text) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -109,15 +125,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
   bootstrap: async () => {
     set({ loading: true });
     try {
-      const [config, status, diagnostics, logs] = await Promise.all([
-        api.getConfig(),
-        api.getProxyStatus(),
-        api.getDiagnostics(),
-        api.getLogs(),
-      ]);
+      const [edition, config, status, tunnelStatus, diagnostics, logs] =
+        await Promise.all([
+          api.getEditionInfo(),
+          api.getConfig(),
+          api.getProxyStatus(),
+          api.getTunnelStatus(),
+          api.getDiagnostics(),
+          api.getLogs(),
+        ]);
       set({
+        edition,
         config,
         status,
+        tunnelStatus,
         diagnostics,
         logs: [...logs].reverse(),
         loading: false,
@@ -165,6 +186,56 @@ export const useAppStore = create<AppStore>((set, get) => ({
       await get().refreshDiagnostics();
     } catch (err) {
       get().addToast("error", formatError(err));
+    }
+  },
+
+  setProxyTunnel: async (id, tunnelEnabled, tunnelRouteName) => {
+    try {
+      const config = await api.setProxyTunnel(
+        id,
+        tunnelEnabled,
+        tunnelRouteName,
+      );
+      set({ config });
+      get().addToast(
+        "info",
+        tunnelEnabled
+          ? "Proxy enabled for public tunnel"
+          : "Proxy removed from public tunnel",
+      );
+    } catch (err) {
+      get().addToast("error", formatError(err));
+    }
+  },
+
+  startTunnel: async () => {
+    set({ busyAction: "tunnel" });
+    try {
+      const tunnelStatus = await api.startTunnel();
+      set({ tunnelStatus });
+      get().addToast(
+        "success",
+        tunnelStatus.hostname
+          ? `OpenTunnel active on ${tunnelStatus.hostname}`
+          : "OpenTunnel connecting...",
+      );
+    } catch (err) {
+      get().addToast("error", formatError(err));
+    } finally {
+      set({ busyAction: null });
+    }
+  },
+
+  stopTunnel: async () => {
+    set({ busyAction: "tunnel" });
+    try {
+      const tunnelStatus = await api.stopTunnel();
+      set({ tunnelStatus });
+      get().addToast("info", "OpenTunnel disconnected");
+    } catch (err) {
+      get().addToast("error", formatError(err));
+    } finally {
+      set({ busyAction: null });
     }
   },
 

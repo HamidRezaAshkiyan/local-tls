@@ -7,6 +7,7 @@ pub mod proxy;
 pub mod state;
 pub mod storage;
 pub mod tray;
+pub mod tunnel;
 
 use state::AppState;
 use std::sync::Arc;
@@ -49,15 +50,24 @@ pub fn run() {
                     let _ = window.hide();
                 } else if let Some(state) = window.app_handle().try_state::<Arc<AppState>>() {
                     state.proxy.stop();
+                    let tunnel = Arc::clone(&state.tunnel);
+                    tauri::async_runtime::spawn(async move {
+                        let _ = tunnel.stop().await;
+                    });
                 }
             }
         })
         .invoke_handler(tauri::generate_handler![
+            commands::get_edition_info,
             commands::get_config,
             commands::add_proxy,
             commands::update_proxy,
             commands::delete_proxy,
             commands::toggle_proxy,
+            commands::set_proxy_tunnel,
+            commands::get_tunnel_status,
+            commands::start_tunnel,
+            commands::stop_tunnel,
             commands::add_group,
             commands::update_group,
             commands::delete_group,

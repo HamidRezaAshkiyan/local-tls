@@ -717,6 +717,8 @@ mod tests {
                 enabled: true,
                 group_id: "default".into(),
                 created_at: Utc::now(),
+                tunnel_enabled: false,
+                tunnel_route_name: None,
             },
             ProxyEntry {
                 id: "2".into(),
@@ -726,6 +728,8 @@ mod tests {
                 enabled: true,
                 group_id: "default".into(),
                 created_at: Utc::now(),
+                tunnel_enabled: false,
+                tunnel_route_name: None,
             },
         ];
 
@@ -764,6 +768,8 @@ mod tests {
             enabled: true,
             group_id: "default".into(),
             created_at: Utc::now(),
+            tunnel_enabled: false,
+            tunnel_route_name: None,
         });
         controller.update_routes(&updated_proxies);
 

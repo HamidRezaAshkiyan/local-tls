@@ -13,6 +13,8 @@ export interface ProxyEntry {
   enabled: boolean;
   groupId: string;
   createdAt: string;
+  tunnelEnabled?: boolean;
+  tunnelRouteName?: string | null;
 }
 
 export interface AppSettings {
@@ -21,6 +23,7 @@ export interface AppSettings {
   enableHttpRedirect: boolean;
   minimizeToTray: boolean;
   theme: "dark" | "light" | "system" | string;
+  tunnelApiUrl?: string | null;
 }
 
 export interface AppConfig {
@@ -51,6 +54,21 @@ export interface ProxyServerStatus {
   lastError: string | null;
 }
 
+export interface EditionInfo {
+  edition: "standard" | "tunnel" | string;
+  tunnelSupported: boolean;
+}
+
+export interface TunnelStatus {
+  supported: boolean;
+  running: boolean;
+  state: string;
+  hostname: string | null;
+  publicUrls: Record<string, string>;
+  connections: number;
+  lastError: string | null;
+}
+
 export interface DiagnosticsReport {
   os: string;
   dataDir: string;
@@ -74,6 +92,8 @@ export interface AddProxyInput {
   targetPort: number;
   groupId: string;
   enabled?: boolean;
+  tunnelEnabled?: boolean;
+  tunnelRouteName?: string | null;
 }
 
 export interface UpdateProxyInput {
@@ -83,6 +103,8 @@ export interface UpdateProxyInput {
   targetPort: number;
   groupId: string;
   enabled: boolean;
+  tunnelEnabled?: boolean;
+  tunnelRouteName?: string | null;
 }
 
 export type ActiveTab = "proxies" | "logs" | "diagnostics" | "settings";

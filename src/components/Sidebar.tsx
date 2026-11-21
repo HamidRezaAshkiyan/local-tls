@@ -1,5 +1,6 @@
 import {
   Activity,
+  Cloud,
   Globe,
   Moon,
   Power,
@@ -20,19 +21,24 @@ const NAV_ITEMS: { id: ActiveTab; label: string; icon: typeof Globe }[] = [
 
 export function Sidebar() {
   const {
+    edition,
     activeTab,
     setActiveTab,
     status,
+    tunnelStatus,
     diagnostics,
     logs,
     config,
     busyAction,
     startProxy,
     stopProxy,
+    startTunnel,
+    stopTunnel,
     updateSettings,
   } = useAppStore();
 
   const running = status?.running ?? false;
+  const tunnelRunning = tunnelStatus?.running ?? false;
   const isDark = (config?.settings.theme ?? "dark") !== "light";
 
   const toggleTheme = () => {
@@ -51,9 +57,20 @@ export function Sidebar() {
           <ShieldCheck className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            LocalTLS
-          </h1>
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              LocalTLS
+            </h1>
+            <span
+              className={`rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wide uppercase ${
+                edition.tunnelSupported
+                  ? "bg-violet-500/15 text-violet-600 dark:text-violet-400"
+                  : "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+              }`}
+            >
+              {edition.tunnelSupported ? "Tunnel" : "Standard"}
+            </span>
+          </div>
           <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
             {diagnostics?.os ?? "Desktop"} SSL Proxy
           </p>
@@ -61,7 +78,7 @@ export function Sidebar() {
       </div>
 
       {/* Primary Proxy Server Control */}
-      <div className="px-4 pb-4">
+      <div className="space-y-2.5 px-4 pb-4">
         <div className="rounded-xl border border-zinc-200 bg-white p-3.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -99,6 +116,57 @@ export function Sidebar() {
                 : "Start Proxy Server"}
           </button>
         </div>
+
+        {/* OpenTunnel Control Card (Tunnel Edition only) */}
+        {edition.tunnelSupported && (
+          <div className="rounded-xl border border-violet-500/25 bg-white p-3.5 shadow-sm dark:bg-zinc-900/70">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`h-2.5 w-2.5 rounded-full ${
+                    tunnelStatus?.state === "connected"
+                      ? "bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.75)]"
+                      : tunnelRunning
+                        ? "animate-pulse bg-amber-500"
+                        : "bg-zinc-400 dark:bg-zinc-600"
+                  }`}
+                />
+                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">
+                  OpenTunnel
+                </span>
+              </div>
+              <span className="rounded-md bg-violet-500/10 px-1.5 py-0.5 font-mono text-[10px] text-violet-600 dark:text-violet-400">
+                {tunnelStatus?.state ?? "stopped"}
+              </span>
+            </div>
+
+            {tunnelStatus?.hostname && tunnelRunning && (
+              <div className="mb-2.5 truncate font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+                *.{tunnelStatus.hostname}
+              </div>
+            )}
+
+            <button
+              type="button"
+              disabled={busyAction === "tunnel"}
+              onClick={() =>
+                tunnelRunning ? void stopTunnel() : void startTunnel()
+              }
+              className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                tunnelRunning
+                  ? "bg-rose-500/15 text-rose-600 hover:bg-rose-500/25 dark:text-rose-400"
+                  : "bg-violet-600 text-white hover:bg-violet-500 shadow-sm shadow-violet-600/20"
+              } disabled:opacity-50`}
+            >
+              <Cloud className="h-3.5 w-3.5" />
+              {busyAction === "tunnel"
+                ? "Connecting..."
+                : tunnelRunning
+                  ? "Disconnect Tunnel"
+                  : "Connect Public Tunnel"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}

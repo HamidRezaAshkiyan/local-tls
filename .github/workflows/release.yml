@@ -1,4 +1,4 @@
-name: Build & Release LocalTLS (macOS & Windows)
+name: Build & Release LocalTLS (macOS & Windows — Standard & Tunnel Editions)
 
 on:
   push:
@@ -28,11 +28,15 @@ jobs:
           workspaces: "./src-tauri -> target"
       - run: npm ci
       - run: npm run build
-      - run: cargo test
+      - name: Test Standard Edition
+        run: cargo test
+        working-directory: src-tauri
+      - name: Test Tunnel Edition (with opentunnel)
+        run: cargo test --features tunnel
         working-directory: src-tauri
 
   bundle:
-    name: Bundle (${{ matrix.platform }})
+    name: Bundle ${{ matrix.edition }} (${{ matrix.platform }})
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     needs: test-and-check
     permissions:
@@ -41,10 +45,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest
+          - edition: Standard
+            platform: macos-latest
             args: "--target aarch64-apple-darwin"
-          - platform: windows-latest
+          - edition: Tunnel
+            platform: macos-latest
+            args: "--target aarch64-apple-darwin --features tunnel --config src-tauri/tauri.tunnel.conf.json"
+          - edition: Standard
+            platform: windows-latest
             args: ""
+          - edition: Tunnel
+            platform: windows-latest
+            args: "--features tunnel --config src-tauri/tauri.tunnel.conf.json"
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -68,11 +80,10 @@ jobs:
           releaseBody: |
             ## LocalTLS v__VERSION__
 
-            Cross-platform localhost SSL reverse proxy manager for **macOS** and **Windows** — no Docker required.
+            Cross-platform localhost SSL reverse proxy manager for **macOS** and **Windows** — available in two editions:
 
-            ### Downloads
-            - **macOS (Apple Silicon)**: `.dmg` installer
-            - **Windows (x64)**: `.msi` or `-setup.exe` (NSIS) installer
+            - **Standard Edition (`LocalTLS`)**: Lightweight local-only HTTPS/WebSocket reverse proxy with Local Root CA and managed hosts sync (zero external tunnel dependencies).
+            - **Tunnel Edition (`LocalTLS Tunnel`)**: Includes everything in Standard Edition **plus** built-in blind-TLS public tunnels powered by [`opentunnel`](https://github.com/anomalyco/opentunnel) (`https://<route>.<id>.opentunnel.xyz`).
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

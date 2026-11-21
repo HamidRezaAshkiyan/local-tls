@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   Check,
+  Cloud,
   Copy,
   ExternalLink,
   FolderPlus,
@@ -20,12 +21,15 @@ import { ProxyModal } from "./ProxyModal";
 
 export function ProxiesView() {
   const {
+    edition,
     config,
     status,
+    tunnelStatus,
     diagnostics,
     selectedGroupId,
     setSelectedGroupId,
     toggleProxy,
+    setProxyTunnel,
     deleteProxy,
     syncHosts,
     trustRootCa,
@@ -263,6 +267,9 @@ export function ProxiesView() {
                   <th className="px-4 py-3">Target Upstream</th>
                   <th className="px-4 py-3">Group</th>
                   <th className="px-4 py-3">Hosts</th>
+                  {edition.tunnelSupported && (
+                    <th className="px-4 py-3">Public Tunnel</th>
+                  )}
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -357,6 +364,50 @@ export function ProxiesView() {
                           </span>
                         )}
                       </td>
+                      {edition.tunnelSupported && (
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                void setProxyTunnel(
+                                  proxy.id,
+                                  !proxy.tunnelEnabled,
+                                )
+                              }
+                              title={
+                                proxy.tunnelEnabled
+                                  ? "Disable public tunnel for this proxy"
+                                  : "Expose this proxy via OpenTunnel"
+                              }
+                              className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition ${
+                                proxy.tunnelEnabled
+                                  ? "bg-violet-500/15 text-violet-700 hover:bg-violet-500/25 dark:text-violet-400"
+                                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                              }`}
+                            >
+                              <Cloud className="h-3 w-3" />
+                              {proxy.tunnelEnabled ? "Shared" : "Off"}
+                            </button>
+                            {proxy.tunnelEnabled &&
+                              tunnelStatus?.publicUrls?.[proxy.id] && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const pubUrl =
+                                      tunnelStatus.publicUrls[proxy.id];
+                                    void navigator.clipboard.writeText(pubUrl);
+                                    addToast("info", `Copied ${pubUrl}`);
+                                  }}
+                                  title={tunnelStatus.publicUrls[proxy.id]}
+                                  className="cursor-pointer rounded p-1 text-violet-500 hover:bg-violet-500/15"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </button>
+                              )}
+                          </div>
+                        </td>
+                      )}
                       <td className="px-4 py-3 text-right">
                         <div className="inline-flex items-center gap-1">
                           <button

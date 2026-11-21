@@ -1,0 +1,16 @@
+{
+  "productName": "LocalTLS Tunnel",
+  "identifier": "com.localtls.tunnel",
+  "app": {
+    "windows": [
+      {
+        "title": "LocalTLS Tunnel — Localhost SSL Proxy & Public Tunnels",
+        "width": 1160,
+        "height": 760,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true
+      }
+    ]
+  }
+}
