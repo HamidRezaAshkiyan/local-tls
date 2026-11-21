@@ -9,6 +9,10 @@ edition = "2021"
 name = "local_tls_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[features]
+default = []
+tunnel = ["dep:opentunnel"]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -35,6 +39,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 time = "0.3"
 x509-parser = "0.16"
 parking_lot = "0.12"
+opentunnel = { version = "0.6.2", optional = true }
 
 [dev-dependencies]
 tempfile = "3"

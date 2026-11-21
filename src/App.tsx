@@ -7,11 +7,18 @@ import { SettingsView } from "./components/SettingsView";
 import { Sidebar } from "./components/Sidebar";
 import { ToastContainer } from "./components/ToastContainer";
 import { useAppStore } from "./store/useAppStore";
-import type { ProxyLogEntry, ProxyServerStatus } from "./types";
+import type { ProxyLogEntry, ProxyServerStatus, TunnelStatus } from "./types";
 
 export default function App() {
-  const { activeTab, config, loading, bootstrap, pushLog, setStatus } =
-    useAppStore();
+  const {
+    activeTab,
+    config,
+    loading,
+    bootstrap,
+    pushLog,
+    setStatus,
+    setTunnelStatus,
+  } = useAppStore();
 
   useEffect(() => {
     void bootstrap();
@@ -27,11 +34,19 @@ export default function App() {
       },
     );
 
+    const unlistenTunnel = listen<TunnelStatus>(
+      "tunnel-status-changed",
+      (event) => {
+        setTunnelStatus(event.payload);
+      },
+    );
+
     return () => {
       void unlistenLog.then((fn) => fn());
       void unlistenStatus.then((fn) => fn());
+      void unlistenTunnel.then((fn) => fn());
     };
-  }, [bootstrap, pushLog, setStatus]);
+  }, [bootstrap, pushLog, setStatus, setTunnelStatus]);
 
   useEffect(() => {
     const theme = config?.settings.theme ?? "dark";

@@ -5,12 +5,15 @@ import type {
   AppConfig,
   AppSettings,
   DiagnosticsReport,
+  EditionInfo,
   ProxyLogEntry,
   ProxyServerStatus,
+  TunnelStatus,
   UpdateProxyInput,
 } from "../types";
 
 export const api = {
+  getEditionInfo: () => invoke<EditionInfo>("get_edition_info"),
   getConfig: () => invoke<AppConfig>("get_config"),
   addProxy: (input: AddProxyInput) => invoke<AppConfig>("add_proxy", { input }),
   updateProxy: (input: UpdateProxyInput) =>
@@ -18,6 +21,20 @@ export const api = {
   deleteProxy: (id: string) => invoke<AppConfig>("delete_proxy", { id }),
   toggleProxy: (id: string, enabled: boolean) =>
     invoke<AppConfig>("toggle_proxy", { id, enabled }),
+  setProxyTunnel: (
+    id: string,
+    tunnelEnabled: boolean,
+    tunnelRouteName?: string | null,
+  ) =>
+    invoke<AppConfig>("set_proxy_tunnel", {
+      id,
+      tunnelEnabled,
+      tunnelRouteName: tunnelRouteName ?? null,
+    }),
+
+  getTunnelStatus: () => invoke<TunnelStatus>("get_tunnel_status"),
+  startTunnel: () => invoke<TunnelStatus>("start_tunnel"),
+  stopTunnel: () => invoke<TunnelStatus>("stop_tunnel"),
 
   addGroup: (name: string, color: string) =>
     invoke<AppConfig>("add_group", { name, color }),

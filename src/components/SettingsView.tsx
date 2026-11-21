@@ -4,7 +4,8 @@ import { api } from "../lib/tauri";
 import { useAppStore } from "../store/useAppStore";
 
 export function SettingsView() {
-  const { config, updateSettings, importConfig, addToast } = useAppStore();
+  const { edition, config, updateSettings, importConfig, addToast } =
+    useAppStore();
   const settings = config?.settings;
 
   const [httpsPort, setHttpsPort] = useState(
@@ -18,6 +19,9 @@ export function SettingsView() {
     settings?.minimizeToTray ?? true,
   );
   const [theme, setTheme] = useState(settings?.theme ?? "dark");
+  const [tunnelApiUrl, setTunnelApiUrl] = useState(
+    settings?.tunnelApiUrl ?? "",
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -27,6 +31,7 @@ export function SettingsView() {
     setEnableHttpRedirect(settings.enableHttpRedirect);
     setMinimizeToTray(settings.minimizeToTray);
     setTheme(settings.theme);
+    setTunnelApiUrl(settings.tunnelApiUrl ?? "");
   }, [settings]);
 
   const handleSave = async (e: FormEvent) => {
@@ -39,6 +44,7 @@ export function SettingsView() {
         enableHttpRedirect,
         minimizeToTray,
         theme,
+        tunnelApiUrl: tunnelApiUrl.trim() || null,
       });
     } catch (err) {
       addToast("error", typeof err === "string" ? err : "Failed to save settings");
@@ -166,6 +172,31 @@ export function SettingsView() {
               </select>
             </div>
           </div>
+
+          {edition.tunnelSupported && (
+            <div className="rounded-xl border border-violet-500/25 bg-white p-5 dark:bg-zinc-900/60">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                OpenTunnel (Tunnel Edition)
+              </h3>
+              <p className="mt-1 text-xs text-zinc-500">
+                Leave blank to use the default hosted blind-TLS service (
+                <code>https://opentunnel.xyz</code>), or enter your self-hosted
+                OpenTunnel server URL.
+              </p>
+              <div className="mt-4">
+                <label className="mb-1.5 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Custom OpenTunnel API URL (optional)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://opentunnel.xyz"
+                  value={tunnelApiUrl}
+                  onChange={(e) => setTunnelApiUrl(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 font-mono text-xs text-zinc-900 outline-none focus:border-violet-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

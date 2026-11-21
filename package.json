@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev:standard": "tauri dev",
+    "tauri:dev:tunnel": "tauri dev --features tunnel --config src-tauri/tauri.tunnel.conf.json",
+    "tauri:build:standard": "tauri build",
+    "tauri:build:tunnel": "tauri build --features tunnel --config src-tauri/tauri.tunnel.conf.json"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",

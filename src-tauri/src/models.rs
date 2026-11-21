@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,6 +21,10 @@ pub struct ProxyEntry {
     pub enabled: bool,
     pub group_id: String,
     pub created_at: DateTime<Utc>,
+    #[serde(default)]
+    pub tunnel_enabled: bool,
+    #[serde(default)]
+    pub tunnel_route_name: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -30,6 +35,8 @@ pub struct AppSettings {
     pub enable_http_redirect: bool,
     pub minimize_to_tray: bool,
     pub theme: String,
+    #[serde(default)]
+    pub tunnel_api_url: Option<String>,
 }
 
 impl Default for AppSettings {
@@ -40,6 +47,7 @@ impl Default for AppSettings {
             enable_http_redirect: true,
             minimize_to_tray: true,
             theme: "dark".to_string(),
+            tunnel_api_url: None,
         }
     }
 }
@@ -96,6 +104,26 @@ pub struct ProxyServerStatus {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct EditionInfo {
+    pub edition: String,
+    pub tunnel_supported: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TunnelStatusDto {
+    pub supported: bool,
+    pub running: bool,
+    pub state: String,
+    pub hostname: Option<String>,
+    /// Maps proxy ID -> live public HTTPS URL (e.g. `https://api.<id>.opentunnel.xyz`)
+    pub public_urls: HashMap<String, String>,
+    pub connections: usize,
+    pub last_error: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DiagnosticsReport {
     pub os: String,
     pub data_dir: String,
@@ -121,6 +149,10 @@ pub struct AddProxyInput {
     pub target_port: u16,
     pub group_id: String,
     pub enabled: Option<bool>,
+    #[serde(default)]
+    pub tunnel_enabled: Option<bool>,
+    #[serde(default)]
+    pub tunnel_route_name: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -132,4 +164,8 @@ pub struct UpdateProxyInput {
     pub target_port: u16,
     pub group_id: String,
     pub enabled: bool,
+    #[serde(default)]
+    pub tunnel_enabled: Option<bool>,
+    #[serde(default)]
+    pub tunnel_route_name: Option<String>,
 }

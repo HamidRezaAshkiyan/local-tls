@@ -2,6 +2,7 @@ use crate::certs::CertManager;
 use crate::models::{AppConfig, ProxyLogEntry};
 use crate::proxy::ProxyController;
 use crate::storage;
+use crate::tunnel::TunnelController;
 use parking_lot::RwLock;
 use std::collections::VecDeque;
 use std::path::PathBuf;
@@ -14,6 +15,7 @@ pub struct AppState {
     pub config: RwLock<AppConfig>,
     pub cert_manager: Arc<CertManager>,
     pub proxy: Arc<ProxyController>,
+    pub tunnel: Arc<TunnelController>,
     pub logs: RwLock<VecDeque<ProxyLogEntry>>,
 }
 
@@ -22,6 +24,7 @@ impl AppState {
         let config = storage::load_config(&data_dir)?;
         let cert_manager = Arc::new(CertManager::new(data_dir.clone()));
         let proxy = Arc::new(ProxyController::new(&config.proxies));
+        let tunnel = Arc::new(TunnelController::new(data_dir.clone(), &config.proxies));
 
         // Pre-generate Local Root CA on first boot (no privilege prompt yet; user chooses when to trust)
         let _ = cert_manager.ensure_root_ca();
@@ -31,6 +34,7 @@ impl AppState {
             config: RwLock::new(config),
             cert_manager,
             proxy,
+            tunnel,
             logs: RwLock::new(VecDeque::with_capacity(MAX_LOG_ENTRIES)),
         })
     }
