@@ -9,6 +9,7 @@ import {
   Sun,
   Terminal,
 } from "lucide-react";
+import pkg from "../../package.json";
 import { useAppStore } from "../store/useAppStore";
 import type { ActiveTab } from "../types";
 
@@ -72,7 +73,8 @@ export function Sidebar() {
             </span>
           </div>
           <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-            {diagnostics?.os ?? "Desktop"} SSL Proxy
+            {diagnostics?.os ?? "Desktop"} SSL Proxy ·{" "}
+            <span className="font-mono">v{pkg.version}</span>
           </p>
         </div>
       </div>

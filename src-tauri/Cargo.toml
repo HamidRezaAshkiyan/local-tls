@@ -1,6 +1,6 @@
 [package]
 name = "ophiuchi-rs"
-version = "0.2.0"
+version = "0.2.1"
 description = "Cross-platform localhost SSL reverse proxy manager for macOS and Windows"
 authors = ["Ophiuchi-rs Contributors"]
 edition = "2021"

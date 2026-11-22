@@ -1,5 +1,6 @@
 import { Download, Save, Upload } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
+import pkg from "../../package.json";
 import { api } from "../lib/tauri";
 import { useAppStore } from "../store/useAppStore";
 
@@ -81,14 +82,19 @@ export function SettingsView() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <header className="border-b border-zinc-200 px-6 py-5 dark:border-zinc-800/80">
-        <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Settings
-        </h2>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Configure proxy ports, background tray behavior, appearance, and
-          backups.
-        </p>
+      <header className="flex items-center justify-between border-b border-zinc-200 px-6 py-5 dark:border-zinc-800/80">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+            Settings
+          </h2>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Configure proxy ports, background tray behavior, appearance, and
+            backups.
+          </p>
+        </div>
+        <span className="rounded-md bg-zinc-100 px-2 py-1 font-mono text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+          v{pkg.version}
+        </span>
       </header>
 
       <div className="flex-1 overflow-y-auto p-6">
